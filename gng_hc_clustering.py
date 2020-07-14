@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 from mpl_toolkits.mplot3d import Axes3D
+import pickle
 
 if __name__ == "__main__":
 
@@ -10,9 +11,14 @@ if __name__ == "__main__":
     output_labels_path = 'data/node_labels.npy'
 
     gng_output = np.load(output_path)
-    gng_input = np.load(input_path)
+    # gng_input = np.load(input_path)
     output_labels = np.load(output_labels_path)
     input_labels = []
+
+    f = open('data/patches', 'rb')
+    patches = pickle.load(f)
+    f.close()
+    gng_input = np.array([p.sv for p in patches])
 
     # クラスタリング
     for i, v in enumerate(gng_input):
@@ -31,7 +37,10 @@ if __name__ == "__main__":
                 dist = tmp_dist
                 nearest_idx = j
         
-        input_labels.append(output_labels[nearest_idx])
+        # input_labels.append(output_labels[nearest_idx])
+        patches[i].hc_cluster = output_labels[nearest_idx]
+    
+    input_labels = [p.hc_cluster for p in patches]
     
     # プロット
     fig = plt.figure()
@@ -41,4 +50,6 @@ if __name__ == "__main__":
     plt.colorbar(sc)
     plt.show()
 
-    np.save('data/input_labels', input_labels)
+    # np.save('data/input_labels', input_labels)
+    f = open('data/patches', 'wb')
+    pickle.dump(patches, f)
