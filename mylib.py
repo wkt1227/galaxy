@@ -48,7 +48,12 @@ def get_fits_name_from_objid(objid, f = 'r'):
     return fits_name
 
 class Patch:
-    def __init__(self, center_coord, img, sample_vector):
+    def __init__(self, fits_path, center_coord, img):
+        self.fits_path = fits_path
         self.coord = center_coord
         self.img = img
-        self.sv = sample_vector
+        
+        self.sv = 0
+        self.gng_cluster = 0
+        self.hc_cluster = 0
+        self.galaxy = 0

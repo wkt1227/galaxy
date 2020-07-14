@@ -2,11 +2,15 @@ import numpy as np
 from neupy import algorithms, utils
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+import pickle
 
 if __name__ == '__main__':
 
-    sample_vectors = np.load('data/sample_vectors.npy')
-    sample_vectors_p = np.load('data/sample_vectors_p.npy')
+    # sample_vectors = np.load('data/sample_vectors.npy')
+    # sample_vectors_p = np.load('data/sample_vectors_p.npy')
+    f = open('data/patches', 'rb')
+    patches = pickle.load(f)
+    sample_vectors = np.array([p.sv for p in patches])
 
     sv_len = len(sample_vectors[0])
 
@@ -22,8 +26,8 @@ if __name__ == '__main__':
         step=0.1,
         neighbour_step=0.001,
 
-        max_edge_age=50,
-        max_nodes=200,
+        max_edge_age=70,
+        max_nodes=250,
         n_iter_before_neuron_added=200,
 
         after_split_error_decay_rate = 0.5,
@@ -31,7 +35,7 @@ if __name__ == '__main__':
         min_distance_for_update=0.2,
     )
 
-    gng.train(sample_vectors, epochs=10)
+    gng.train(sample_vectors, epochs=40)
 
     nodes = []
     
@@ -39,7 +43,7 @@ if __name__ == '__main__':
         nodes.append(node.weight[0])
 
     np.save('data/gng_output', nodes)
-
+    
     # inputのプロット
     fig = plt.figure()
     ax = Axes3D(fig)
@@ -64,4 +68,5 @@ if __name__ == '__main__':
     ax.set_xlabel('sample vector[0]')
     ax.set_ylabel('sample vector[1]')
     ax.set_zlabel('sample vector[2]')
+    ax.set_title('nodes:{}'.format(len(gng.graph.nodes)))
     plt.show()

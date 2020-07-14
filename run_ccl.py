@@ -11,6 +11,11 @@ path = 'data/fits/fpC-001729-r3-0083.fit.gz'
 fits = iofits.open(path)
 img = fits[0].data
 
+f = open('data/patches', 'rb')
+patches = pickle.load(f)
+f.close()
+patch_ids = [(p.fits_path, p.coord) for p in patches]
+
 # ガウシアンフィット
 mean, std = norm.fit(img.flatten())
 
@@ -38,14 +43,14 @@ plt.imshow(label_imgs)
 plt.colorbar()
 plt.show()
 
-galaxies = []
-
 for i in range(1, n_labels):
     galaxy = np.array(np.where(label_imgs == i)).T
     if len(galaxy) <= 5:
         continue
-    galaxies.append(galaxy)
-
-print(len(galaxies))
-f = open('data/galaxies.txt', 'wb')
-pickle.dump(galaxies, f)
+    
+    for x, y in galaxy:
+        patch_id = patch_ids.index((path, (x, y)))
+        patches[patch_id].galaxy = i
+        
+f = open('data/patches', 'wb')
+pickle.dump(patches, f)
