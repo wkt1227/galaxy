@@ -22,8 +22,12 @@ sky = result.mean[0]
 img = img - sky
 img_abs = np.abs(img)
 
+print('ガウシアンフィットのσ: {}'.format(result.stddev[0]))
+print('画像の平均: {}'.format(np.mean(img_abs)))
+print('画像の中央値: {}'.format(np.median(img_abs)))
+
 # sigma = ガウシアンフィットの分散の平方根
-plt.imshow(img >= 3*result.stddev[0], cmap='gray')
+plt.imshow(img >= 4*result.stddev[0], cmap='gray')
 plt.show()
 
 # sigma = 画像の平均
@@ -33,5 +37,3 @@ plt.show()
 # sigma = 画像の中央値
 plt.imshow(img >= 4*np.median(img_abs), cmap='gray')
 plt.show()
-
-print(result.stddev[0], np.mean(img_abs), np.median(img_abs))

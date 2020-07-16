@@ -5,6 +5,7 @@ import statistics
 from mylib import Patch
 import pickle
 from scipy.stats import norm
+from astropy.wcs import WCS
 
 
 if __name__ == '__main__':
@@ -23,13 +24,21 @@ if __name__ == '__main__':
     sample_vectors = []
     sample_vectors_p = []
     coordinates = np.array(np.where(img >= 4*sigma)).T
+    
+    #WCS
+    wcs = WCS(fits[0].header)
 
     patch_size = 6
 
     for x, y in coordinates:
         patch = img[x-patch_size:x+patch_size, y-patch_size:y+patch_size]
         patches.append(patch)
-        patches2.append(Patch(path, (x, y), patch))
+        
+        # pix_coord => sky_coord
+        sky_coord = wcs.wcs_pix2world(x, y, 0)
+        print(sky_coord)
+        
+        patches2.append(Patch(path, (x, y), sky_coord, patch))
 
     for i, patch in enumerate(patches):
         # パワースペクトル
@@ -43,9 +52,9 @@ if __name__ == '__main__':
         sample_vector_p = sample_vector_p / statistics.pstdev(sample_vector_p)
         sample_vectors_p.append(sample_vector_p)
         
-        patches2[i].sv = sample_vector_p
+        patches2[i].sv = sample_vector
 
     np.save('data/sample_vectors', sample_vectors)
     np.save('data/sample_vectors_p', sample_vectors_p)
-    f = open('data/patches', 'wb')
-    pickle.dump(patches2, f)
+    with open('data/patches', 'wb') as f:
+        pickle.dump(patches2, f)

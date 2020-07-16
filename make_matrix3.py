@@ -3,8 +3,9 @@ import numpy as np
 
 if __name__ == "__main__":
     
-    f = open('data/patches', 'rb')
-    patches = pickle.load(f)
+    with open('data/patches', 'rb') as f:
+        patches = pickle.load(f)
+    
     galaxy_num = 0
     p_class_num = 0
     patches = [p for p in patches if p.galaxy > 0]
@@ -13,7 +14,7 @@ if __name__ == "__main__":
         galaxy_num = max(galaxy_num, patch.galaxy)
         p_class_num = max(p_class_num, patch.hc_cluster)
             
-    matrix3 = np.zeros((galaxy_num, p_class_num + 1))
+    matrix3 = np.zeros((galaxy_num, p_class_num + 1)).astype(np.float64)
     
     galaxies = [[] for _ in range(galaxy_num)]
     
@@ -23,7 +24,8 @@ if __name__ == "__main__":
         p_class = patch.hc_cluster
         matrix3[galaxy, p_class] += 1 
     
-    f = open('data/galaxies', 'wb')
-    pickle.dump(galaxies, f)
+    with open('data/galaxies', 'wb') as f:
+        pickle.dump(galaxies, f)
+        
     np.save('data/matrix3', matrix3)
     print(matrix3)

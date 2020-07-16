@@ -11,10 +11,10 @@ path = 'data/fits/fpC-001729-r3-0083.fit.gz'
 fits = iofits.open(path)
 img = fits[0].data
 
-f = open('data/patches', 'rb')
-patches = pickle.load(f)
-f.close()
-patch_ids = [(p.fits_path, p.coord) for p in patches]
+with open('data/patches', 'rb') as f:
+    patches = pickle.load(f)
+
+patch_ids = [(p.fits_path, p.pix_coord) for p in patches]
 
 # ガウシアンフィット
 mean, std = norm.fit(img.flatten())
@@ -24,10 +24,10 @@ img_p_abs = np.abs(img_p)
 img_pp = np.zeros_like(img_p)
 # sigma = np.mean(img_p_abs)
 sigma = std
-coordinates = np.array(np.where(img_p >= 4*sigma)).T
-p_size = 4
+picked_pix_coords = np.array(np.where(img_p >= 4*sigma)).T
+p_size = 6
 
-for x, y in coordinates:
+for x, y in picked_pix_coords:
     patch = img[x-p_size:x+p_size, y-p_size:y+p_size]
     mean = np.mean(patch)
     img_pp[x, y] = mean
@@ -45,12 +45,13 @@ plt.show()
 
 for i in range(1, n_labels):
     galaxy = np.array(np.where(label_imgs == i)).T
-    if len(galaxy) <= 5:
-        continue
+    # if len(galaxy) <= 5:
+    #     continue
     
     for x, y in galaxy:
         patch_id = patch_ids.index((path, (x, y)))
         patches[patch_id].galaxy = i
         
-f = open('data/patches', 'wb')
-pickle.dump(patches, f)
+with open('data/patches', 'wb') as f:
+    pickle.dump(patches, f)
+

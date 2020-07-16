@@ -8,8 +8,9 @@ if __name__ == '__main__':
 
     # sample_vectors = np.load('data/sample_vectors.npy')
     # sample_vectors_p = np.load('data/sample_vectors_p.npy')
-    f = open('data/patches', 'rb')
-    patches = pickle.load(f)
+    with open('data/patches', 'rb') as f:
+        patches = pickle.load(f)
+
     sample_vectors = np.array([p.sv for p in patches])
 
     sv_len = len(sample_vectors[0])
